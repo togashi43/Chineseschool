@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChineseMaster - 中国語学習アプリ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .level-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .level-btn:hover, .level-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .daily-task {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9ff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .daily-task:hover {
+            background: #e8f0ff;
+        }
+
+        .daily-task.completed {
+            background: #e8f5e8;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #667eea;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .task-checkbox.checked {
+            background: #667eea;
+            color: white;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .lesson-card {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lesson-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .grammar-example {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .chinese-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .pinyin {
+            color: #666;
+            font-style: italic;
+        }
+
+        .japanese-translation {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .streak-flame {
+            font-size: 2rem;
+            animation: flicker 1s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 ChineseMaster</h1>
+            <p>ネイティブ講師と一緒に文法から始める中国語学習</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number" id="streak">0</div>
+                <div class="stat-label">連続学習日数</div>
+                <div class="streak-flame">🔥</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="totalPoints">0</div>
+                <div class="stat-label">総獲得ポイント</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="currentLevel">初心者</div>
+                <div class="stat-label">現在のレベル</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="completedLessons">0</div>
+                <div class="stat-label">完了レッスン数</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h3>📚 レベル選択</h3>
+                <div class="level-selector">
+                    <div class="level-btn active" data-level="beginner">完全初心者</div>
+                    <div class="level-btn" data-level="reading">文字が読める</div>
+                    <div class="level-btn" data-level="grammar">文法がわかる</div>
+                    <div class="level-btn" data-level="conversation">会話ができる</div>
+                    <div class="level-btn" data-level="advanced">上級会話</div>
+                    <div class="level-btn" data-level="travel">旅行対応</div>
+                    <div class="level-btn" data-level="business">ビジネス中国語</div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="levelProgress" style="width: 15%"></div>
+                </div>
+                <p><span id="progressPercent">15</span>% 完了</p>
+            </div>
+
+            <div class="card">
+                <h3>✅ 今日のタスク</h3>
+                <div id="dailyTasks">
+                    <div class="daily-task" data-task="grammar">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div>
+                            <strong>基本文法レッスン</strong><br>
+                            <small>主語＋述語＋目的語の構造を学習</small>
+                        </div>
+                    </div>
+                    <div class="daily-task" data-task="vocabulary">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div>
+                            <strong>新出単語10個</strong><br>
+                            <small>日常生活でよく使う単語を覚えよう</small>
+                        </div>
+                    </div>
+                    <div class="daily-task" data-task="pronunciation">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div>
+                            <strong>発音練習</strong><br>
+                            <small>四声とピンインの正確な発音</small>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn" onclick="generateNewTasks()">新しいタスクを生成</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📖 今日のレッスン内容</h3>
+            <div id="lessonContent">
+                <div class="grammar-example">
+                    <h4>基本文法：主語＋動詞＋目的語</h4>
+                    <div class="chinese-text">我喝茶。</div>
+                    <div class="pinyin">Wǒ hē chá.</div>
+                    <div class="japanese-translation">私はお茶を飲みます。</div>
+                </div>
+                
+                <div class="lesson-card" onclick="startLesson('grammar1')">
+                    <strong>レッスン1：基本文型の構造</strong>
+                    <p>中国語の最も基本的な文構造を学びます</p>
+                </div>
+                
+                <div class="lesson-card" onclick="startLesson('pronunciation1')">
+                    <strong>レッスン2：四声の基礎</strong>
+                    <p>中国語の音調システムを理解しましょう</p>
+                </div>
+                
+                <div class="lesson-card" onclick="startLesson('vocabulary1')">
+                    <strong>レッスン3：基本単語50</strong>
+                    <p>日常会話で必須の単語を覚えましょう</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // アプリの状態管理
+        let appState = {
+            streak: 0,
+            totalPoints: 0,
+            currentLevel: 'beginner',
+            completedLessons: 0,
+            completedTasks: new Set(),
+            lastLoginDate: null
+        };
+
+        // レベル定義
+        const levels = {
+            beginner: {
+                name: '完全初心者',
+                tasks: [
+                    { id: 'grammar', title: '基本文法レッスン', description: '主語＋述語＋目的語の構造を学習', points: 10 },
+                    { id: 'pinyin', title: 'ピンイン練習', description: '中国語の発音記号を覚えよう', points: 8 },
+                    { id: 'numbers', title: '数字1-10', description: '基本的な数字を覚えよう', points: 5 }
+                ],
+                lessons: [
+                    { id: 'grammar1', title: '基本文型の構造', content: '中国語の最も基本的な文構造' },
+                    { id: 'pronunciation1', title: '四声の基礎', content: '中国語の音調システム' }
+                ]
+            },
+            reading: {
+                name: '文字が読める',
+                tasks: [
+                    { id: 'characters', title: '漢字練習50個', description: '基本的な漢字を読めるようになろう', points: 15 },
+                    { id: 'sentences', title: '簡単な文章読解', description: '短い文章を読んで理解しよう', points: 12 },
+                    { id: 'pronunciation', title: '発音確認', description: 'ネイティブ音声と比較練習', points: 10 }
+                ]
+            },
+            grammar: {
+                name: '文法がわかる',
+                tasks: [
+                    { id: 'tenses', title: '時制の理解', description: '過去・現在・未来の表現方法', points: 20 },
+                    { id: 'particles', title: '助詞の使い方', description: '的、了、着などの使い分け', points: 18 },
+                    { id: 'complex', title: '複文構造', description: '複雑な文の組み立て方', points: 15 }
+                ]
+            }
+        };
+
+        // 初期化
+        function initializeApp() {
+            loadAppState();
+            checkDailyLogin();
+            updateUI();
+            setupEventListeners();
+        }
+
+        // アプリ状態の読み込み
+        function loadAppState() {
+            const saved = JSON.parse(localStorage.getItem('chineseMasterState') || '{}');
+            appState = { ...appState, ...saved };
+        }
+
+        // アプリ状態の保存
+        function saveAppState() {
+            localStorage.setItem('chineseMasterState', JSON.stringify(appState));
+        }
+
+        // 毎日ログインチェック
+        function checkDailyLogin() {
+            const today = new Date().toDateString();
+            const lastLogin = appState.lastLoginDate;
+            
+            if (lastLogin !== today) {
+                if (lastLogin === new Date(Date.now() - 86400000).toDateString()) {
+                    // 連続ログイン
+                    appState.streak += 1;
+                } else if (lastLogin !== null) {
+                    // ストリーク途切れ
+                    appState.streak = 1;
+                } else {
+                    // 初回ログイン
+                    appState.streak = 1;
+                }
+                
+                appState.lastLoginDate = today;
+                appState.totalPoints += 5; // ログインボーナス
+                saveAppState();
+                
+                showLoginBonus();
+            }
+        }
+
+        // ログインボーナス表示
+        function showLoginBonus() {
+            alert(`🎉 ログインボーナス！\n連続学習 ${appState.streak} 日目\n+5ポイント獲得！`);
+        }
+
+        // UI更新
+        function updateUI() {
+            document.getElementById('streak').textContent = appState.streak;
+            document.getElementById('totalPoints').textContent = appState.totalPoints;
+            document.getElementById('currentLevel').textContent = levels[appState.currentLevel]?.name || '完全初心者';
+            document.getElementById('completedLessons').textContent = appState.completedLessons;
+            
+            updateTasks();
+        }
+
+        // タスク更新
+        function updateTasks() {
+            const currentLevelTasks = levels[appState.currentLevel]?.tasks || levels.beginner.tasks;
+            const tasksContainer = document.getElementById('dailyTasks');
+            
+            tasksContainer.innerHTML = '';
+            
+            currentLevelTasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = `daily-task ${appState.completedTasks.has(task.id) ? 'completed' : ''}`;
+                taskElement.innerHTML = `
+                    <div class="task-checkbox ${appState.completedTasks.has(task.id) ? 'checked' : ''}" onclick="toggleTask(this, '${task.id}', ${task.points})">
+                        ${appState.completedTasks.has(task.id) ? '✓' : ''}
+                    </div>
+                    <div>
+                        <strong>${task.title}</strong><br>
+                        <small>${task.description} (+${task.points}ポイント)</small>
+                    </div>
+                `;
+                tasksContainer.appendChild(taskElement);
+            });
+        }
+
+        // タスク完了切り替え
+        function toggleTask(checkbox, taskId, points) {
+            if (appState.completedTasks.has(taskId)) {
+                appState.completedTasks.delete(taskId);
+                appState.totalPoints -= points;
+                checkbox.classList.remove('checked');
+                checkbox.innerHTML = '';
+                checkbox.parentElement.classList.remove('completed');
+            } else {
+                appState.completedTasks.add(taskId);
+                appState.totalPoints += points;
+                checkbox.classList.add('checked');
+                checkbox.innerHTML = '✓';
+                checkbox.parentElement.classList.add('completed');
+                
+                // 完了アニメーション
+                showTaskComplete(points);
+            }
+            
+            saveAppState();
+            updateUI();
+        }
+
+        // タスク完了アニメーション
+        function showTaskComplete(points) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #4CAF50;
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                font-size: 1.2rem;
+                z-index: 1000;
+                animation: fadeInOut 2s ease-in-out;
+            `;
+            notification.innerHTML = `🎉 タスク完了！<br>+${points}ポイント`;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 2000);
+        }
+
+        // 新しいタスク生成
+        function generateNewTasks() {
+            appState.completedTasks.clear();
+            updateTasks();
+            saveAppState();
+            alert('🔄 新しいタスクが生成されました！');
+        }
+
+        // レッスン開始
+        function startLesson(lessonId) {
+            appState.completedLessons += 1;
+            appState.totalPoints += 25;
+            saveAppState();
+            updateUI();
+            
+            alert(`📖 レッスン "${lessonId}" を開始します！\n+25ポイント獲得！`);
+        }
+
+        // イベントリスナー設定
+        function setupEventListeners() {
+            // レベル選択
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    appState.currentLevel = this.dataset.level;
+                    saveAppState();
+                    updateUI();
+                });
+            });
+        }
+
+        // CSS追加（アニメーション用）
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // アプリ初期化
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
